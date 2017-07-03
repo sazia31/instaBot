@@ -3,13 +3,10 @@ from keys import APP_ACCESS_TOKEN
 import urllib
 from textblob import TextBlob
 from textblob.sentiments import NaiveBayesAnalyzer
-
-from collections import Counter
-import matplotlib.pyplot
-
+import pylab
 #Token Owner : acadtest
 #Sandbox Users : AVinstaBot.test0, AVinstaBot.test1, AVinstaBot.test2...... AVinstaBot.test10
-
+#sandboxSK: _as1228_
 
 
 BASE_URL = 'https://api.instagram.com/v1/'
@@ -248,6 +245,13 @@ def hash_tag(insta_username):
     else:
         print 'Status code other than 200 received!'
     print tags_dictionary
+
+
+    pylab.figure(1)
+    x= range(len(tags_dictionary))
+    pylab.xticks(x,tags_dictionary.keys())
+    pylab.plot(x,tags_dictionary.values(),"b")
+    pylab.show()
 
 
 def start_bot():
