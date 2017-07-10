@@ -30,6 +30,23 @@ def self_info():
     else:
         print 'Status code other than 200 received!'
 
+def follow_request():
+    # get the number of users who have requested to follow you.
+    request_url=( BASE_URL + 'users/self/requested-by?access_token=%s') % (APP_ACCESS_TOKEN)
+    follow_requests= requests.get(request_url).json()
+
+    if follow_requests['meta']['code']== 200:
+        if len(follow_requests['data']):
+            for x in range (0,len(follow_requests['data'])):
+                follow = follow_requests['data'][x]['username']
+                print 'The users with this username are: %s\n' % (follow)
+
+        else:
+            print 'No follow requests!'
+    else:
+        print 'Status code other than 200 received!'
+
+
 
 def get_user_id(insta_username):
     #this function will access the id of a user by a particular username
@@ -161,6 +178,27 @@ def get_post_id(insta_username):
         exit()
 
 
+
+def list_users_liked(insta_username):
+    user_liked = get_post_id(insta_username)
+    if user_liked == None:
+        print 'This user doesnot exist!'
+        exit()
+    request_url = (BASE_URL + 'media/%s/likes?access_token=%s') % (user_liked, APP_ACCESS_TOKEN)
+    media = requests.get(request_url).json()
+
+    if media['meta']['code'] == 200:
+        if len(media['data']):
+
+            for x in range(0, len(media["data"])):
+                print media['data'][x]['username']
+
+        else:
+            print 'There are no likes on this picture!'
+    else:
+        print 'Status code other than 200 received!'
+
+
 def like_a_post(insta_username):
     media_id = get_post_id(insta_username)
     request_url = (BASE_URL + 'media/%s/likes') % (media_id)
@@ -261,7 +299,7 @@ def hash_tag(insta_username):
 
                 # this counts the number of different hashtags occuring on a post!
         else:
-            print 'no data'
+            print 'no data!'
     else:
         print 'Status code other than 200 received!'
     print tags_dictionary
@@ -278,6 +316,8 @@ def hash_tag(insta_username):
     pylab.show()
 
 
+
+
 def start_bot():
     while True:
         print '\n'
@@ -288,16 +328,19 @@ def start_bot():
         print "d. Get the user recent posts! "
         print "e. Get the recent media liked by the user!"
         print 'f. Search for a user!'
-        print "g. Like a post!"
-        print "h. Comment on a post!"
-        print "i. View the list of comments on a particular post!"
-        print "j. Delete negative comment on a user's post!"
-        print "k. Retrieve tags!"
-        print "l. Exit"
+        print 'g. Get a list of users who liked a post!'
+        print "h. Like a post!"
+        print "i. Comment on a post!"
+        print "j. View the list of comments on a particular post!"
+        print "k. Delete negative comment on a user's post!"
+        print "l. Retrieve tags!"
+        print "m. Exit"
 
         user_choice=raw_input("Enter you choice: ")
         if user_choice=="a":
             self_info()
+        #elif user_choice == 's':
+            #follow_request()
         elif user_choice=="b":
             insta_username = raw_input("Enter the username of the user: ")
             if set('[~!@#$%^&*()+{}":;\']+$ " "').intersection(insta_username):
@@ -316,37 +359,44 @@ def start_bot():
             recent_media_like()
         elif user_choice == "f":
             user_search()
-        elif user_choice == "g":
+        elif user_choice == 'g':
+            insta_username= raw_input('Enter the name of the user:')
+            if set('[~!@#$%^&*()+{}":;\']+$ " "').intersection(insta_username):
+                print "Invalid entry."
+            else:
+                list_users_liked(insta_username)
+
+        elif user_choice == "h":
             insta_username=raw_input('Which user post you want to like?')
             if set('[~!@#$%^&*()+{}":;\']+$ " "').intersection(insta_username):
                 print "Invalid entry."
             else:
                like_a_post(insta_username)
-        elif user_choice == "h":
+        elif user_choice == "i":
             insta_username = raw_input('Enter the username on who\'s post you want to comment ?')
             if set('[~!@#$%^&*()+{}":;\']+$ " "').intersection(insta_username):
                 print "Invalid entry."
             else:
                post_a_comment(insta_username)
-        elif user_choice == "i":
+        elif user_choice == "j":
             insta_username = raw_input('Enter the user to view his post\'s comments!')
             if set('[~!@#$%^&*()+{}":;\']+$ " "').intersection(insta_username):
                 print "Invalid entry."
             else:
                view_comments(insta_username)
-        elif user_choice == "j":
+        elif user_choice == "k":
             insta_username = raw_input('From which user\'s post would you like to delete negative comments?')
             if set('[~!@#$%^&*()+{}":;\']+$ " "').intersection(insta_username):
                 print "Invalid entry."
             else:
               delete_negative_comment(insta_username)
-        elif user_choice=="k":
+        elif user_choice=="l":
             insta_username=raw_input('Enter the user:')
             if set('[~!@#$%^&*()+{}":;\']+$ " "').intersection(insta_username):
                 print "Invalid entry."
             else:
               hash_tag(insta_username)
-        elif user_choice=="l":
+        elif user_choice=="m":
             exit()
         else:
             print "Invalid Choice!"
